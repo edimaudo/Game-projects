@@ -1,0 +1,98 @@
+body {
+    background-color: #ccf5f5;
+}
+
+#gameholder {
+    width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 500px) {
+    #gameholder{
+        width: auto;
+        height: auto;
+        max-width: 100%;
+    }
+
+    #title{
+        background-size: auto auto;
+    }
+
+    .penguin1,
+    .penguin2,
+    .penguin3,
+    .penguin4, 
+    .penguin5,
+    .penguin6,
+    .penguin7,
+    .penguin8 ,
+    .yeti{
+         background-size: auto auto;
+         background-position: center center;
+         float: center;
+    }
+   
+}
+
+#title {
+    width: 600px;
+    height: 150px;
+    background-image:url('../assets/penguin_title.png');
+}
+
+.penguin1,
+.penguin2,
+.penguin3,
+.penguin4, 
+.penguin5,
+.penguin6,
+.penguin7,
+.penguin8 ,
+.yeti{
+	width: 200px;
+    height: 200px;
+    float: left;
+}
+
+.penguin1{background-image:url("../assets/mound_1.png");}
+.penguin2{background-image:url("../assets/mound_2.png");}
+.penguin3{background-image:url("../assets/mound_3.png");}
+.penguin4{background-image:url("../assets/mound_4.png");}
+.penguin5{background-image:url("../assets/mound_5.png");}
+.penguin6{background-image:url("../assets/mound_6.png");}
+.penguin7{background-image:url("../assets/mound_7.png");}
+.penguin8{background-image:url("../assets/mound_8.png");}
+.yeti{background-image:url("../assets/mound_9.png");}
+
+.penguin1:hover,
+.penguin2:hover,
+.penguin3:hover,
+.penguin4:hover,
+.penguin5:hover,
+.penguin6:hover,
+.penguin7:hover,
+.penguin8:hover,
+.yeti:hover{cursor: pointer;}
+
+
+.penguin1:hover{background-image:url('../assets/mound_1_hover.png');}
+.penguin2:hover{background-image:url('../assets/mound_2_hover.png');}
+.penguin3:hover{background-image:url('../assets/mound_3_hover.png');}
+.penguin4:hover{background-image:url('../assets/mound_4_hover.png');}
+.penguin5:hover{background-image:url('../assets/mound_5_hover.png');}
+.penguin6:hover{background-image:url('../assets/mound_6_hover.png');}
+.penguin7:hover{background-image:url('../assets/mound_7_hover.png');}
+.penguin8:hover{background-image:url('../assets/mound_8_hover.png');}
+.yeti:hover{background-image:url('../assets/mound_9_hover.png')}
+
+.penguin1:active{background-image:url('../assets/penguin_1.png');}
+.penguin2:active{background-image:url('../assets/penguin_2.png');}
+.penguin3:active{background-image:url('../assets/penguin_3.png');}
+.penguin4:active{background-image:url('../assets/penguin_4.png');}
+.penguin5:active{background-image:url('../assets/penguin_5.png');}
+.penguin6:active{background-image:url('../assets/penguin_6.png');}
+.penguin7:active{background-image:url('../assets/penguin_7.png');}
+.penguin8:active{background-image:url('../assets/penguin_8.png');}
+.yeti:active{background-image:url('../assets/yeti.png');}
+
