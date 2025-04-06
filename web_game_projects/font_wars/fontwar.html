@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>FontWar</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+    }
+    #gameContainer {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="gameContainer"></div>
+  <script>
+    const fonts = [
+      { name: "Futura", css: "Futura, sans-serif" },
+      { name: "Helvetica Neue", css: "'Helvetica Neue', sans-serif" },
+      { name: "Caslon", css: "'Libre Baskerville', serif" },
+      { name: "Monaco", css: "Monaco, monospace" },
+    ];
+
+    const config = {
+      type: Phaser.AUTO,
+      width: 400,
+      height: 600,
+      parent: 'gameContainer',
+      scene: {
+        preload: preload,
+        create: create,
+      },
+    };
+
+    const game = new Phaser.Game(config);
+
+    let currentFont;
+    let score = 0;
+    let level = 1;
+
+    function preload() {
+      this.load.html('buttons', 'buttons.html');
+    }
+
+    function create() {
+      const scene = this;
+
+      function getRandomFont() {
+        return Phaser.Utils.Array.GetRandom(fonts);
+      }
+
+      function updateUI() {
+        fontText.setFontFamily(currentFont.css);
+        fontText.setText(String.fromCharCode(65 + Math.floor(Math.random() * 26)));
+      }
+
+      function nextRound() {
+        currentFont = getRandomFont();
+        updateUI();
+        updateScoreText();
+      }
+
+      function checkAnswer(fontName) {
+        if (fontName === currentFont.name) {
+          score += 10;
+        } else {
+          score = Math.max(0, score - 5);
+        }
+        nextRound();
+      }
+
+      const fontText = scene.add.text(200, 200, 'A', {
+        fontSize: '120px',
+        color: '#222',
+      }).setOrigin(0.5);
+
+      const button1 = scene.add.text(100, 400, '', {
+        fontSize: '24px',
+        backgroundColor: '#ccc',
+        padding: { x: 20, y: 10 },
+      }).setInteractive();
+
+      const button2 = scene.add.text(250, 400, '', {
+        fontSize: '24px',
+        backgroundColor: '#ccc',
+        padding: { x: 20, y: 10 },
+      }).setInteractive();
+
+      const scoreText = scene.add.text(200, 500, '', {
+        fontSize: '18px',
+        color: '#333'
+      }).setOrigin(0.5);
+
+      function updateScoreText() {
+        scoreText.setText(`Score: ${score} | Level: ${level}`);
+      }
+
+      function assignButtons() {
+        let options = fonts.filter(f => f.name !== currentFont.name);
+        let wrongFont = Phaser.Utils.Array.GetRandom(options);
+
+        const shuffled = Phaser.Utils.Array.Shuffle([currentFont.name, wrongFont.name]);
+        button1.setText(shuffled[0]);
+        button2.setText(shuffled[1]);
+
+        button1.on('pointerdown', () => checkAnswer(shuffled[0]));
+        button2.on('pointerdown', () => checkAnswer(shuffled[1]));
+      }
+
+      nextRound();
+      assignButtons();
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" rel="stylesheet">
+</body>
+</html>
