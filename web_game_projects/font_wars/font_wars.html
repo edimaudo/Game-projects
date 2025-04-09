@@ -83,21 +83,16 @@
     .font-card:hover {
       transform: scale(1.05);
     }
-    .font-image {
-      font-size: 24px;
-      margin: 0.5em 0;
-    }
-    .font-info {
-      margin-top: 2em;
+    dialog {
+      max-width: 500px;
       padding: 1em;
-      border: 1px solid #aaa;
+      border: none;
       border-radius: 10px;
-      background-color: #f9f9f9;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
-    .font-info img {
+    dialog img {
       max-width: 100%;
       height: auto;
-      display: block;
       margin: 1em 0;
     }
     .answer-box {
@@ -118,6 +113,7 @@
       width: 45%;
       text-align: center;
       cursor: pointer;
+      font-size: 64px;
     }
     .correct {
       border-color: green;
@@ -149,7 +145,13 @@
     <h1>Font Gallery</h1>
     <input type="text" id="fontSearch" placeholder="Search fonts..." oninput="filterFonts()">
     <div id="fontList" class="font-gallery"></div>
-    <div id="fontInfo" class="hidden font-info"></div>
+    <dialog id="fontDialog">
+      <h3 id="dialogTitle"></h3>
+      <p id="dialogPreview" style="font-size: 24px;"></p>
+      <img id="dialogImage" src="" alt="Font preview">
+      <p id="dialogHistory"></p>
+      <button onclick="document.getElementById('fontDialog').close()">Close</button>
+    </dialog>
   </section>
 
   <section id="game" class="hidden">
@@ -165,10 +167,10 @@
     <div id="questionBox" class="hidden">
       <h2 id="fontName"></h2>
       <div class="answer-box" id="answerBox">
-        <div class="answer" id="option1" onclick="submitAnswer(1)"></div>
-        <div class="answer" id="option2" onclick="submitAnswer(2)"></div>
+        <div class="answer" id="option1" onclick="submitAnswer(1)">A</div>
+        <div class="answer" id="option2" onclick="submitAnswer(2)">A</div>
       </div>
-      <p id="scoreBoard">Score: 0 / 0</p>
+      <p id="scoreBoard">Score: 0 / 20</p>
     </div>
 
     <div id="gameSummary" class="hidden">
@@ -221,9 +223,14 @@
     }
 
     function showFontInfo(font) {
-      const info = document.getElementById('fontInfo');
-      info.classList.remove('hidden');
-      info.innerHTML = `<h3>${font.name}</h3><p style="font-family: ${font.style}; font-size: 24px">${font.name}</p><img src="${font.image}" alt="${font.name} sample image"><p>${font.history}</p>`;
+      const dialog = document.getElementById('fontDialog');
+      document.getElementById('dialogTitle').textContent = font.name;
+      document.getElementById('dialogPreview').textContent = font.name;
+      document.getElementById('dialogPreview').style.fontFamily = font.style;
+      document.getElementById('dialogImage').src = font.image;
+      document.getElementById('dialogImage').alt = `${font.name} preview`;
+      document.getElementById('dialogHistory').textContent = font.history;
+      dialog.showModal();
     }
 
     function startGame() {
@@ -236,6 +243,7 @@
       score = 0;
       document.getElementById('questionBox').classList.remove('hidden');
       document.getElementById('gameSummary').classList.add('hidden');
+      document.getElementById('scoreBoard').textContent = `Score: 0 / 20`;
       showNextQuestion();
     }
 
@@ -259,15 +267,15 @@
         option1.className = 'answer';
         option2.className = 'answer';
 
-        option1.textContent = 'Sample Text';
-        option2.textContent = 'Sample Text';
+        option1.textContent = 'A';
+        option2.textContent = 'A';
         option1.style.fontFamily = isFirstCorrect ? correctFont.style : wrongFont.style;
         option2.style.fontFamily = isFirstCorrect ? wrongFont.style : correctFont.style;
 
         option1.dataset.correct = isFirstCorrect ? 'true' : 'false';
         option2.dataset.correct = isFirstCorrect ? 'false' : 'true';
 
-        document.getElementById('scoreBoard').textContent = `Score: ${score} / ${questionIndex}`;
+        document.getElementById('scoreBoard').textContent = `Score: ${score} / 20`;
         answerBox.classList.add('show');
 
         timer = setTimeout(() => {
@@ -290,8 +298,8 @@
         document.getElementById(`option${correct}`).classList.add('correct');
       }
 
-      document.getElementById('scoreBoard').textContent = `Score: ${score} / ${questionIndex + 1}`;
       questionIndex++;
+      document.getElementById('scoreBoard').textContent = `Score: ${score} / 20`;
       setTimeout(showNextQuestion, 3000);
     }
 
