@@ -65,8 +65,39 @@
     .hidden {
       display: none;
     }
-    .font-sample {
+    .font-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 1em;
+      margin-top: 1em;
+    }
+    .font-card {
+      padding: 1em;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background-color: #fff;
+      cursor: pointer;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+    .font-card:hover {
+      transform: scale(1.05);
+    }
+    .font-image {
       font-size: 24px;
+      margin: 0.5em 0;
+    }
+    .font-info {
+      margin-top: 2em;
+      padding: 1em;
+      border: 1px solid #aaa;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .font-info img {
+      max-width: 100%;
+      height: auto;
+      display: block;
       margin: 1em 0;
     }
     .answer-box {
@@ -96,10 +127,6 @@
       border-color: red;
       background-color: #ffe6e6;
     }
-    #fontList li {
-      cursor: pointer;
-      margin: 0.5em 0;
-    }
   </style>
 </head>
 <body>
@@ -121,8 +148,8 @@
   <section id="gallery" class="hidden">
     <h1>Font Gallery</h1>
     <input type="text" id="fontSearch" placeholder="Search fonts..." oninput="filterFonts()">
-    <ul id="fontList"></ul>
-    <div id="fontInfo" class="hidden"></div>
+    <div id="fontList" class="font-gallery"></div>
+    <div id="fontInfo" class="hidden font-info"></div>
   </section>
 
   <section id="game" class="hidden">
@@ -151,21 +178,16 @@
   </section>
 
   <script>
-    const fontNames = [
-      "Roboto", "Open Sans", "Lato", "Montserrat", "Oswald", "Raleway", "Playfair Display", "Lobster", "Merriweather",
-      "Bebas Neue", "Abril Fatface", "Comfortaa", "Dancing Script", "Fira Sans", "Inconsolata", "Josefin Sans",
-      "Libre Baskerville", "Manrope", "Mukta", "Nanum Gothic", "Noto Serif", "Orbitron", "Pacifico", "Poppins",
-      "Quicksand", "Righteous", "Satisfy", "Slabo 27px", "Titillium Web", "Ubuntu", "Varela Round", "Work Sans",
-      // ... add more up to 200 total fonts
-    ];
+    const fontNames = ["Roboto", "Open Sans", "Lato", "Montserrat", "Oswald", "Raleway", "Playfair Display", "Lobster", "Merriweather", "Bebas Neue", "Abril Fatface", "Comfortaa", "Dancing Script", "Fira Sans", "Inconsolata", "Josefin Sans", "Libre Baskerville", "Manrope", "Mukta", "Nanum Gothic", "Noto Serif", "Orbitron", "Pacifico", "Poppins", "Quicksand", "Righteous", "Satisfy", "Slabo 27px", "Titillium Web", "Ubuntu", "Varela Round", "Work Sans"];
 
-    const fonts = fontNames.slice(0, 200).map(name => ({
+    const fonts = fontNames.map(name => ({
       name,
       style: `'${name}', sans-serif`,
-      history: `${name} is a typeface available via Google Fonts.`
+      history: `${name} is a Google Font designed to showcase clean and modern typography for digital experiences.`,
+      image: `https://via.placeholder.com/300x80?text=${encodeURIComponent(name)}`
     }));
 
-    const googleFontQuery = fontNames.slice(0, 200).map(f => f.replace(/ /g, '+')).join('&family=');
+    const googleFontQuery = fontNames.map(f => f.replace(/ /g, '+')).join('&family=');
     document.getElementById('googleFonts').href = `https://fonts.googleapis.com/css2?family=${googleFontQuery}&display=swap`;
 
     let currentSection = 'about';
@@ -187,22 +209,21 @@
 
     function filterFonts() {
       const query = document.getElementById('fontSearch').value.toLowerCase();
-      const list = document.getElementById('fontList');
-      list.innerHTML = '';
-      fonts.sort((a, b) => a.name.localeCompare(b.name)).forEach(font => {
-        if (font.name.toLowerCase().includes(query)) {
-          const li = document.createElement('li');
-          li.textContent = font.name;
-          li.onclick = () => showFontInfo(font);
-          list.appendChild(li);
-        }
+      const container = document.getElementById('fontList');
+      container.innerHTML = '';
+      fonts.filter(f => f.name.toLowerCase().includes(query)).sort((a, b) => a.name.localeCompare(b.name)).forEach(font => {
+        const card = document.createElement('div');
+        card.className = 'font-card';
+        card.innerHTML = `<div class="font-image" style="font-family: ${font.style}">${font.name}</div>`;
+        card.onclick = () => showFontInfo(font);
+        container.appendChild(card);
       });
     }
 
     function showFontInfo(font) {
       const info = document.getElementById('fontInfo');
       info.classList.remove('hidden');
-      info.innerHTML = `<h3>${font.name}</h3><p class="font-sample" style="font-family: ${font.style}">${font.name}</p><p>${font.history}</p>`;
+      info.innerHTML = `<h3>${font.name}</h3><p style="font-family: ${font.style}; font-size: 24px">${font.name}</p><img src="${font.image}" alt="${font.name} sample image"><p>${font.history}</p>`;
     }
 
     function startGame() {
@@ -237,6 +258,9 @@
 
         option1.className = 'answer';
         option2.className = 'answer';
+
+        option1.textContent = 'Sample Text';
+        option2.textContent = 'Sample Text';
         option1.style.fontFamily = isFirstCorrect ? correctFont.style : wrongFont.style;
         option2.style.fontFamily = isFirstCorrect ? wrongFont.style : correctFont.style;
 
