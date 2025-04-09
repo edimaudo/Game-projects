@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Font Wars</title>
+  <link id="googleFonts" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+    }
+    body.dark {
+      background-color: #121212;
+      color: #f0f0f0;
+    }
+    nav {
+      background-color: #333;
+      color: white;
+      padding: 1em;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      margin: 0 1em;
+      text-decoration: none;
+    }
+    .dark-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5em;
+    }
+    .dark-toggle input[type="checkbox"] {
+      width: 40px;
+      height: 20px;
+      position: relative;
+      appearance: none;
+      background: #ccc;
+      outline: none;
+      border-radius: 20px;
+      transition: 0.3s;
+    }
+    .dark-toggle input[type="checkbox"]:checked {
+      background: #666;
+    }
+    .dark-toggle input[type="checkbox"]::before {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      top: 1px;
+      left: 1px;
+      background: white;
+      transition: 0.3s;
+    }
+    .dark-toggle input[type="checkbox"]:checked::before {
+      left: 21px;
+    }
+    section {
+      padding: 2em;
+    }
+    .hidden {
+      display: none;
+    }
+    .font-sample {
+      font-size: 24px;
+      margin: 1em 0;
+    }
+    .answer-box {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 2em;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s, transform 0.5s;
+    }
+    .answer-box.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .answer {
+      padding: 1em;
+      border: 2px solid #ccc;
+      width: 45%;
+      text-align: center;
+      cursor: pointer;
+    }
+    .correct {
+      border-color: green;
+      background-color: #e6ffe6;
+    }
+    .wrong {
+      border-color: red;
+      background-color: #ffe6e6;
+    }
+    #fontList li {
+      cursor: pointer;
+      margin: 0.5em 0;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#" onclick="showSection('about')">About</a>
+    <a href="#" onclick="showSection('gallery')">Font Gallery</a>
+    <a href="#" onclick="showSection('game')">Game</a>
+    <label class="dark-toggle">
+      <span>🌙</span>
+      <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+    </label>
+  </nav>
+
+  <section id="about">
+    <h1>About Font Wars</h1>
+    <p>Font Wars is a fun and educational game where you test your font recognition skills. Match font names with their correct appearances to score points!</p>
+  </section>
+
+  <section id="gallery" class="hidden">
+    <h1>Font Gallery</h1>
+    <input type="text" id="fontSearch" placeholder="Search fonts..." oninput="filterFonts()">
+    <ul id="fontList"></ul>
+    <div id="fontInfo" class="hidden"></div>
+  </section>
+
+  <section id="game" class="hidden">
+    <h1>Font Wars Game</h1>
+    <label for="difficulty">Choose difficulty:</label>
+    <select id="difficulty">
+      <option value="easy">Easy (20s)</option>
+      <option value="medium">Medium (10s)</option>
+      <option value="hard">Hard (5s)</option>
+    </select>
+    <button onclick="startGame()">Start Game</button>
+
+    <div id="questionBox" class="hidden">
+      <h2 id="fontName"></h2>
+      <div class="answer-box" id="answerBox">
+        <div class="answer" id="option1" onclick="submitAnswer(1)"></div>
+        <div class="answer" id="option2" onclick="submitAnswer(2)"></div>
+      </div>
+      <p id="scoreBoard">Score: 0 / 0</p>
+    </div>
+
+    <div id="gameSummary" class="hidden">
+      <h2>Game Over!</h2>
+      <p id="finalScore"></p>
+    </div>
+  </section>
+
+  <script>
+    const fontNames = [
+      "Roboto", "Open Sans", "Lato", "Montserrat", "Oswald", "Raleway", "Playfair Display", "Lobster", "Merriweather",
+      "Bebas Neue", "Abril Fatface", "Comfortaa", "Dancing Script", "Fira Sans", "Inconsolata", "Josefin Sans",
+      "Libre Baskerville", "Manrope", "Mukta", "Nanum Gothic", "Noto Serif", "Orbitron", "Pacifico", "Poppins",
+      "Quicksand", "Righteous", "Satisfy", "Slabo 27px", "Titillium Web", "Ubuntu", "Varela Round", "Work Sans",
+      // ... add more up to 200 total fonts
+    ];
+
+    const fonts = fontNames.slice(0, 200).map(name => ({
+      name,
+      style: `'${name}', sans-serif`,
+      history: `${name} is a typeface available via Google Fonts.`
+    }));
+
+    const googleFontQuery = fontNames.slice(0, 200).map(f => f.replace(/ /g, '+')).join('&family=');
+    document.getElementById('googleFonts').href = `https://fonts.googleapis.com/css2?family=${googleFontQuery}&display=swap`;
+
+    let currentSection = 'about';
+    let gameFonts = [];
+    let questionIndex = 0;
+    let score = 0;
+    let timer;
+    let timeLimit = 20000;
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark');
+    }
+
+    function showSection(section) {
+      document.getElementById(currentSection).classList.add('hidden');
+      document.getElementById(section).classList.remove('hidden');
+      currentSection = section;
+    }
+
+    function filterFonts() {
+      const query = document.getElementById('fontSearch').value.toLowerCase();
+      const list = document.getElementById('fontList');
+      list.innerHTML = '';
+      fonts.sort((a, b) => a.name.localeCompare(b.name)).forEach(font => {
+        if (font.name.toLowerCase().includes(query)) {
+          const li = document.createElement('li');
+          li.textContent = font.name;
+          li.onclick = () => showFontInfo(font);
+          list.appendChild(li);
+        }
+      });
+    }
+
+    function showFontInfo(font) {
+      const info = document.getElementById('fontInfo');
+      info.classList.remove('hidden');
+      info.innerHTML = `<h3>${font.name}</h3><p class="font-sample" style="font-family: ${font.style}">${font.name}</p><p>${font.history}</p>`;
+    }
+
+    function startGame() {
+      const difficulty = document.getElementById('difficulty').value;
+      if (difficulty === 'medium') timeLimit = 10000;
+      else if (difficulty === 'hard') timeLimit = 5000;
+      else timeLimit = 20000;
+      gameFonts = [...fonts].sort(() => 0.5 - Math.random()).slice(0, 20);
+      questionIndex = 0;
+      score = 0;
+      document.getElementById('questionBox').classList.remove('hidden');
+      document.getElementById('gameSummary').classList.add('hidden');
+      showNextQuestion();
+    }
+
+    function showNextQuestion() {
+      if (questionIndex >= 20) {
+        endGame();
+        return;
+      }
+      const answerBox = document.getElementById('answerBox');
+      answerBox.classList.remove('show');
+
+      setTimeout(() => {
+        const correctFont = gameFonts[questionIndex];
+        const wrongFont = fonts.filter(f => f.name !== correctFont.name)[Math.floor(Math.random() * (fonts.length - 1))];
+        const isFirstCorrect = Math.random() > 0.5;
+
+        document.getElementById('fontName').textContent = `Select the correct font for: ${correctFont.name}`;
+        const option1 = document.getElementById('option1');
+        const option2 = document.getElementById('option2');
+
+        option1.className = 'answer';
+        option2.className = 'answer';
+        option1.style.fontFamily = isFirstCorrect ? correctFont.style : wrongFont.style;
+        option2.style.fontFamily = isFirstCorrect ? wrongFont.style : correctFont.style;
+
+        option1.dataset.correct = isFirstCorrect ? 'true' : 'false';
+        option2.dataset.correct = isFirstCorrect ? 'false' : 'true';
+
+        document.getElementById('scoreBoard').textContent = `Score: ${score} / ${questionIndex}`;
+        answerBox.classList.add('show');
+
+        timer = setTimeout(() => {
+          submitAnswer(null);
+        }, timeLimit);
+      }, 300);
+    }
+
+    function submitAnswer(selected) {
+      clearTimeout(timer);
+      const option1 = document.getElementById('option1');
+      const option2 = document.getElementById('option2');
+      const correct = option1.dataset.correct === 'true' ? 1 : 2;
+
+      if (selected === correct) {
+        score++;
+        document.getElementById(`option${selected}`).classList.add('correct');
+      } else {
+        if (selected) document.getElementById(`option${selected}`).classList.add('wrong');
+        document.getElementById(`option${correct}`).classList.add('correct');
+      }
+
+      document.getElementById('scoreBoard').textContent = `Score: ${score} / ${questionIndex + 1}`;
+      questionIndex++;
+      setTimeout(showNextQuestion, 3000);
+    }
+
+    function endGame() {
+      document.getElementById('questionBox').classList.add('hidden');
+      document.getElementById('gameSummary').classList.remove('hidden');
+      document.getElementById('finalScore').textContent = `You got ${score} out of 20 correct.`;
+      localStorage.setItem('lastScore', score);
+      localStorage.setItem('lastPlayed', new Date().toISOString());
+    }
+
+    window.onload = () => {
+      const savedScore = localStorage.getItem('lastScore');
+      const lastPlayed = localStorage.getItem('lastPlayed');
+      if (savedScore && lastPlayed) {
+        document.getElementById('about').innerHTML += `<p>Last score: ${savedScore}/20 on ${new Date(lastPlayed).toLocaleString()}</p>`;
+      }
+      filterFonts();
+    }
+  </script>
+</body>
+</html>
