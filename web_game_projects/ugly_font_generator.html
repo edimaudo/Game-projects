@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ugly Font Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+    h1 {
+      margin-top: 20px;
+      color: #333;
+    }
+    #generator {
+      background: #fff;
+      padding: 20px;
+      margin-top: 20px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 600px;
+      text-align: center;
+    }
+    .ugly-font-preview {
+      margin-top: 20px;
+      font-size: 24px;
+      transition: all 0.3s;
+    }
+    input, button {
+      padding: 10px;
+      margin: 5px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Ugly Font Style Generator</h1>
+  <div id="generator">
+    <button onclick="generateUglyFont()">Generate Ugly Font Style</button>
+    <br>
+    <input type="text" id="userInput" placeholder="Enter your text">
+    <button onclick="styleUserText()">Style My Text</button>
+    <div id="output" class="ugly-font-preview"></div>
+  </div>
+
+  <script>
+    const uglyFontStyles = [
+      { fontFamily: 'Comic Sans MS, cursive, sans-serif', fontWeight: 'bold', color: '#FF00FF', transform: 'skewX(10deg)' },
+      { fontFamily: 'Papyrus, fantasy', fontStyle: 'italic', color: '#00FFFF', transform: 'rotate(-5deg)' },
+      { fontFamily: 'Impact, Charcoal, sans-serif', color: '#ED3731', letterSpacing: '2px' },
+      { fontFamily: 'Courier New, Courier, monospace', textDecoration: 'underline', color: '#F68128' },
+      { fontFamily: 'Brush Script MT, cursive', fontWeight: 'lighter', color: '#FBAC23', background: '#FFDA1F' },
+      { fontFamily: 'Lucida Console, Monaco, monospace', color: '#F25A2C', transform: 'rotate(3deg)', letterSpacing: '-1px' }
+    ];
+
+    function generateUglyFont() {
+      const text = 'Ugly Font Preview!';
+      const style = uglyFontStyles[Math.floor(Math.random() * uglyFontStyles.length)];
+      const output = document.getElementById('output');
+      applyStyle(output, style);
+      output.textContent = text;
+    }
+
+    function styleUserText() {
+      const input = document.getElementById('userInput').value;
+      if (!input) return;
+      const style = uglyFontStyles[Math.floor(Math.random() * uglyFontStyles.length)];
+      const output = document.getElementById('output');
+      applyStyle(output, style);
+      output.textContent = input;
+    }
+
+    function applyStyle(element, styleObj) {
+      element.style = '';
+      for (const prop in styleObj) {
+        element.style[prop] = styleObj[prop];
+      }
+    }
+  </script>
+</body>
+</html>
