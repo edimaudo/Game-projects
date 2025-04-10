@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ugly Color Palette Generator</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Arial', sans-serif;
+    }
+    
+    body {
+      background-color: #f0f0f0;
+      padding: 2rem;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+    
+    .description {
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      text-align: center;
+      color: #555;
+    }
+    
+    .controls {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      gap: 1rem;
+      padding: 1.5rem;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-group {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    
+    label {
+      min-width: 180px;
+      font-weight: bold;
+    }
+    
+    select, button {
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+    
+    button {
+      background-color: #333;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      border: none;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: #555;
+    }
+    
+    .palette-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 800px;
+      margin: 0 auto;
+      gap: 1rem;
+    }
+    
+    .palette {
+      display: flex;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .color {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0.5rem;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .color:hover {
+      transform: translateY(-5px);
+    }
+    
+    .color-code {
+      background-color: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+    }
+    
+    .tooltip {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: black;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      display: none;
+    }
+    
+    .color:hover .tooltip {
+      display: block;
+    }
+    
+    .generation-info {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      margin-top: 1rem;
+    }
+    
+    .info-title {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .input-group {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      label {
+        margin-bottom: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ugly Color Palette Generator</h1>
+  </header>
+  
+  <div class="description">
+    <p>Create intentionally clashing, jarring, and "ugly" color combinations. Explore the space of visual discomfort and challenge conventional color harmony.</p>
+  </div>
+  
+  <div class="controls">
+    <div class="input-group">
+      <label for="ugly-method">Ugliness Method:</label>
+      <select id="ugly-method">
+        <option value="clashing">Maximum Clashing</option>
+        <option value="saturated">Over-Saturated</option>
+        <option value="muddy">Muddy Mix</option>
+        <option value="neon">Neon Assault</option>
+        <option value="brownish">Brownish Disaster</option>
+      </select>
+    </div>
+    
+    <div class="input-group">
+      <label for="colors-count">Number of Colors:</label>
+      <select id="colors-count">
+        <option value="3">3 Colors</option>
+        <option value="4">4 Colors</option>
+        <option value="5" selected>5 Colors</option>
+        <option value="6">6 Colors</option>
+      </select>
+    </div>
+    
+    <div class="input-group">
+      <button id="generate-btn">Generate Ugly Palette</button>
+      <button id="copy-btn">Copy Colors</button>
+    </div>
+  </div>
+  
+  <div class="palette-container">
+    <div class="palette" id="palette">
+      <!-- Colors will be added dynamically -->
+    </div>
+    
+    <div class="generation-info">
+      <div class="info-title">How This Ugly Palette Works:</div>
+      <div id="palette-explanation">
+        Click "Generate Ugly Palette" to create your first monstrosity.
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const generateBtn = document.getElementById('generate-btn');
+      const copyBtn = document.getElementById('copy-btn');
+      const uglyMethodSelect = document.getElementById('ugly-method');
+      const colorsCountSelect = document.getElementById('colors-count');
+      const paletteContainer = document.getElementById('palette');
+      const paletteExplanation = document.getElementById('palette-explanation');
+      
+      // Generate initial palette
+      generatePalette();
+      
+      generateBtn.addEventListener('click', generatePalette);
+      copyBtn.addEventListener('click', copyPalette);
+      
+      function generatePalette() {
+        const method = uglyMethodSelect.value;
+        const count = parseInt(colorsCountSelect.value);
+        
+        // Clear existing palette
+        paletteContainer.innerHTML = '';
+        
+        let colors = [];
+        let explanation = '';
+        
+        switch(method) {
+          case 'clashing':
+            colors = generateClashingColors(count);
+            explanation = 'This palette uses colors from opposite sides of the color wheel, with jarring brightness and saturation differences that create maximum visual tension.';
+            break;
+          case 'saturated':
+            colors = generateOversaturatedColors(count);
+            explanation = 'These over-saturated colors are pushed to their limits, creating a visually overwhelming experience that strains the eyes.';
+            break;
+          case 'muddy':
+            colors = generateMuddyColors(count);
+            explanation = 'This palette mixes colors that should never meet, creating unappealing brownish and grayish tones that lack definition and clarity.';
+            break;
+          case 'neon':
+            colors = generateNeonColors(count);
+            explanation = 'An assault of ultra-bright neon colors that creates visual vibration and discomfort when placed adjacent to each other.';
+            break;
+          case 'brownish':
+            colors = generateBrownishColors(count);
+            explanation = 'These are variations of brown and other "unpopular" colors that create a particularly dated and unfashionable aesthetic.';
+            break;
+        }
+        
+        paletteExplanation.textContent = explanation;
+        
+        // Add colors to palette
+        colors.forEach(color => {
+          const colorElement = document.createElement('div');
+          colorElement.className = 'color';
+          colorElement.style.backgroundColor = color;
+          
+          const colorCode = document.createElement('div');
+          colorCode.className = 'color-code';
+          colorCode.textContent = color;
+          
+          const tooltip = document.createElement('div');
+          tooltip.className = 'tooltip';
+          tooltip.textContent = 'Click to copy';
+          
+          colorElement.appendChild(colorCode);
+          colorElement.appendChild(tooltip);
+          paletteContainer.appendChild(colorElement);
+          
+          colorElement.addEventListener('click', function() {
+            navigator.clipboard.writeText(color);
+            tooltip.textContent = 'Copied!';
+            setTimeout(() => {
+              tooltip.textContent = 'Click to copy';
+            }, 1500);
+          });
+        });
+      }
+      
+      function copyPalette() {
+        const colors = [];
+        document.querySelectorAll('.color-code').forEach(code => {
+          colors.push(code.textContent);
+        });
+        
+        navigator.clipboard.writeText(colors.join(', '))
+          .then(() => {
+            alert('Colors copied to clipboard!');
+          })
+          .catch(err => {
+            console.error('Could not copy text: ', err);
+          });
+      }
+      
+      function generateClashingColors(count) {
+        const colors = [];
+        const hueStep = 360 / count;
+        
+        for (let i = 0; i < count; i++) {
+          const hue = (i * hueStep + 20) % 360;
+          const sat = Math.random() > 0.5 ? '100%' : '50%';
+          const light = Math.random() > 0.5 ? '75%' : '35%';
+          colors.push(`hsl(${hue}, ${sat}, ${light})`);
+        }
+        
+        return colors;
+      }
+      
+      function generateOversaturatedColors(count) {
+        const colors = [];
+        const baseHues = [0, 60, 120, 180, 240, 300]; // Red, Yellow, Green, Cyan, Blue, Magenta
+        
+        for (let i = 0; i < count; i++) {
+          const hue = baseHues[i % baseHues.length];
+          colors.push(`hsl(${hue}, 100%, 50%)`);
+        }
+        
+        return colors;
+      }
+      
+      function generateMuddyColors(count) {
+        const colors = [];
+        
+        for (let i = 0; i < count; i++) {
+          const r = 100 + Math.floor(Math.random() * 100);
+          const g = 80 + Math.floor(Math.random() * 100);
+          const b = 60 + Math.floor(Math.random() * 100);
+          colors.push(`rgb(${r}, ${g}, ${b})`);
+        }
+        
+        return colors;
+      }
+      
+      function generateNeonColors(count) {
+        const neonBase = [
+          '#ff00ff', // Magenta
+          '#00ff00', // Lime
+          '#ff0000', // Red
+          '#ffff00', // Yellow
+          '#00ffff', // Cyan
+          '#ff8800'  // Orange
+        ];
+        
+        const colors = [];
+        for (let i = 0; i < count; i++) {
+          colors.push(neonBase[i % neonBase.length]);
+        }
+        
+        return colors;
+      }
+      
+      function generateBrownishColors(count) {
+        const colors = [];
+        
+        for (let i = 0; i < count; i++) {
+          const r = 120 + Math.floor(Math.random() * 100);
+          const g = 80 + Math.floor(Math.random() * 70);
+          const b = 40 + Math.floor(Math.random() * 60);
+          colors.push(`rgb(${r}, ${g}, ${b})`);
+        }
+        
+        return colors;
+      }
+    });
+  </script>
+</body>
+</html>
