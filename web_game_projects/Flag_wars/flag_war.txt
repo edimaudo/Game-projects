@@ -1,0 +1,38 @@
+Persona: Web game developer
+Brief: Create a web based game called Flag Wars.  
+About: The game is a flag and country quiz game that takes thing to a whole 'nother' Level.  It should also be mobile phone friendly.
+Tooling: Build using either html, css, vanilla javascript and jquery or phaser framework
+
+Description:
+The game will have 4 sections:
+
+A) Game
+B) Settings
+C) About
+D) Country Gallery
+
+
+A) Game: It would have two game modes: Country mode, flag mode.
+The game would be based on the game difficulty set.  
+Each game will have 1 round.  Each round has 15 questions.  There will be a score counter out of 15.  It would also show the game countdown clock based on the difficulty.
+
+1) In the Country mode, the game will show A country Name and give the user 4 flag images as options.  The user has to select the correct flag that corresponds to the country name that is show.  If the correct flag is selected, it will be highlighted in green. The score counter would increase by 1.  If the incorrect flag is selected it will be highlighted in red.  The correct flag will then be highlighted in green.  Furthermore, if the game countdown clock hits zero, it would highlight the correct answer.  The score will remain the same. There would be a 3 seconds wait between question when answer is selected.  When the 3 seconds is there would be a smooth transition to the next question.  
+2) The Flag mode will the similar to the Country mode, the only difference is that it would show a country flag and the options would be country names. 
+
+B Settings: It will show the settings used for the game.  
+
+These are the settings the game will have:
+1) A toggle for light or dark mode
+
+2) Game difficulty.  It would be set to easy by default.  There will be 3 levels: Easy, Medium, Hard.  
+- Easy would be 20 seconds for a user to answer a question
+- Medium would be 10 seconds for a user to answer a question
+- Hard would be 5 seconds for a user to answer a question
+
+3) It would also give you the ability to select a continent or show all countries.  If a continent is selected then the questions the game would show would be only on that continent, other wise it would show all countries.
+
+4) Score: It would show the users highest score in the different game types
+
+C) About: It would tell you what the game is about.  It will contain what the game is about and how to play the game.
+
+D) Country Gallery: It will contain a list of all countries. This will be in a list form when viewed on mobile or a gallery form when on a desktop or tablet.  The list will have country name and the corresponding country flag.  When you click/tap on the country name or flag, it will go to a separate section that will show the country name, flag image, capital, contient, population size, total area in (square kilometres or miles), highest point in (metres or miles), country formation date, beer consumption (litres per year), GDP in US dollars, Country Currency.  It would also give the ability to filter by continent/NATO/G8/OPEC.

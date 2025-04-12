@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flag Wars</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🏁 Flag Wars</h1>
+    <nav>
+      <button data-section="game-section">Game</button>
+      <button data-section="settings-section">Settings</button>
+      <button data-section="about-section">About</button>
+      <button data-section="gallery-section">Country Gallery</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Game Section -->
+    <section id="game-section">
+      <div class="game-controls">
+        <button id="mode-country">Play Country Mode</button>
+        <button id="mode-flag">Play Flag Mode</button>
+        <p id="timer"></p>
+        <p id="score">Score: 0</p>
+      </div>
+      <div id="question-container"></div>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="settings-section" class="hidden">
+      <h2>Game Settings</h2>
+      <label>
+        <input type="checkbox" id="dark-mode-toggle" /> Dark Mode
+      </label>
+      <label>
+        Difficulty:
+        <select id="difficulty">
+          <option value="easy">Easy (20s)</option>
+          <option value="medium">Medium (10s)</option>
+          <option value="hard">Hard (5s)</option>
+        </select>
+      </label>
+      <label>
+        Continent:
+        <select id="continent-filter">
+          <option value="all">All</option>
+          <option value="Africa">Africa</option>
+          <option value="Asia">Asia</option>
+          <option value="Europe">Europe</option>
+          <option value="North America">North America</option>
+          <option value="South America">South America</option>
+          <option value="Oceania">Oceania</option>
+        </select>
+      </label>
+      <h3>High Scores</h3>
+      <p>Country Mode: <span id="highscore-country">0</span></p>
+      <p>Flag Mode: <span id="highscore-flag">0</span></p>
+    </section>
+
+    <!-- About Section -->
+    <section id="about-section" class="hidden">
+      <h2>About Flag Wars</h2>
+      <p>Flag Wars is a fast-paced flag and country quiz game that challenges your knowledge of global geography. Select a mode, pick your difficulty, and race against the clock to see how many you can get right!</p>
+      <p>Created with love for adventurers, trivia nerds, and map lovers. 🌍</p>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery-section" class="hidden">
+      <h2>Country Gallery</h2>
+      <label>
+        Filter:
+        <select id="gallery-filter">
+          <option value="all">All</option>
+          <option value="nato">NATO</option>
+          <option value="g8">G8</option>
+          <option value="opec">OPEC</option>
+        </select>
+      </label>
+      <div id="country-list" class="gallery"></div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="country-modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="modal-close">&times;</span>
+      <div id="country-details"></div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="utils.js"></script>
+  <script src="settings.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
