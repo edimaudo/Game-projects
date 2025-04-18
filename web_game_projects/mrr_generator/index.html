@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MRRFlex Dashboard Clone</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <header>
+      <h1>MRRFlex Dashboard</h1>
+    </header>
+
+    <section class="controls">
+      <label for="generator">Generator:</label>
+      <select id="generator">
+        <option value="exponential">Exponential</option>
+        <option value="sinusoidal">Sinusoidal</option>
+        <option value="tangential">Tangential</option>
+        <option value="generate">Generate</option>
+        <option value="linear">Linear</option>
+        <option value="logarithmic">Logarithmic</option>
+        <option value="randomWalk">Random Walk</option>
+        <option value="spike">Spike</option>
+        <option value="flatline">Flatline</option>
+        <option value="noisySine">Noisy Sine</option>
+        <option value="stepFunction">Step Function</option>
+        <option value="pulse">Pulse</option>
+      </select>
+
+      <button id="downloadChart">Download Chart</button>
+      <label>
+        <input type="checkbox" id="compareToggle"> Compare with Previous Year
+      </label>
+    </section>
+
+    <section class="chart-container">
+      <canvas id="chartCanvas"></canvas>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
