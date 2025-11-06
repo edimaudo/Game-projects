@@ -14,7 +14,7 @@ D) Country Gallery
 
 A) Game: It would have two game modes: Country mode, flag mode.
 The game would be based on the game difficulty set.  
-Each game will have 1 round.  Each round has 15 questions.  There will be a score counter out of 15.  It would also show the game countdown clock based on the difficulty.
+Each game will have 1 round.  Each round has 15 questions.  There will be a score counter out of 15.  It would also have a timer.  The final score will be  
 
 1) In the Country mode, the game will show A country Name and give the user 4 flag images as options.  The user has to select the correct flag that corresponds to the country name that is show.  If the correct flag is selected, it will be highlighted in green. The score counter would increase by 1.  If the incorrect flag is selected it will be highlighted in red.  The correct flag will then be highlighted in green.  Furthermore, if the game countdown clock hits zero, it would highlight the correct answer.  The score will remain the same. There would be a 3 seconds wait between question when answer is selected.  When the 3 seconds is there would be a smooth transition to the next question.  
 2) The Flag mode will the similar to the Country mode, the only difference is that it would show a country flag and the options would be country names. 

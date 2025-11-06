@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FontBattle</title>
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.0/dist/phaser.min.js"></script>
+  <style>
+    :root{
+      --navy-900:#072033; /* bg */
+      --navy-800:#0d2f44; /* panels */
+      --navy-700:#145166; /* buttons */
+      --accent:#7fd1c9;
+      --text:#f3f6f7;
+      --muted:#b8c0cc;
+      --light-bg:#f7f9fa;
+      --light-text:#0b1a26;
+    }
+    [data-theme="dark"]{ background:var(--navy-900); color:var(--text); }
+    [data-theme="light"]{ background:var(--light-bg); color:var(--light-text); }
+    html,body{height:100%; margin:0; font-family:system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    #game-container{ width:100%; height:100vh; position:relative; overflow:hidden; }
+    /* top nav */
+    .topbar{ position:absolute; top:10px; left:10px; right:10px; display:flex; justify-content:space-between; align-items:center; z-index:10; gap:8px; }
+    .topbar .left, .topbar .right{ display:flex; gap:8px; align-items:center; }
+    .btn{ background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.06); color:var(--text); padding:8px 12px; border-radius:8px; cursor:pointer; font-weight:700; }
+    .btn:focus{ outline:3px solid var(--accent); outline-offset:3px; }
+    .panel{ position:absolute; inset:76px 16px 96px 16px; background:rgba(255,255,255,0.03); border-radius:12px; padding:18px; box-shadow:0 8px 24px rgba(0,0,0,0.35); overflow:auto; z-index:5; }
+    .center{ display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:12px; text-align:center; }
+    h1{ margin:0; font-size:28px; }
+    p{ margin:0; color:var(--muted); }
+    .choices{ display:flex; gap:14px; margin-top:10px; flex-wrap:wrap; justify-content:center; }
+    .choice-btn{ padding:12px 18px; border-radius:12px; border:none; cursor:pointer; font-weight:800; background:var(--navy-700); color:var(--text); min-width:160px; box-shadow:0 6px 18px rgba(0,0,0,0.35); }
+    .choice-btn:focus{ outline:3px solid var(--accent); outline-offset:3px; }
+    .hud{ position:absolute; bottom:18px; left:18px; right:18px; display:flex; justify-content:space-between; gap:8px; z-index:10; }
+    .pill{ background:rgba(255,255,255,0.04); padding:10px 14px; border-radius:999px; font-weight:700; color:var(--text); }
+    .banner{ background:var(--accent); color:#042028; padding:12px 18px; border-radius:12px; font-weight:900; box-shadow:0 8px 24px rgba(0,0,0,0.25); }
+    /* responsive glyph */
+    #glyph { font-weight:700; line-height:1; user-select:none; -webkit-user-select:none; }
+    /* sr */
+    #sr{ position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+    /* settings list */
+    .settings-row{ display:flex; gap:12px; align-items:center; margin-top:8px; flex-wrap:wrap; }
+    label{ font-weight:700; }
+    input[type="number"]{ width:80px; padding:6px 8px; border-radius:6px; border:1px solid rgba(0,0,0,0.08); }
+    .small{ font-size:13px; color:var(--muted); margin-top:6px; }
+    /* light theme adjustments */
+    [data-theme="light"] .panel{ background:rgba(11,26,38,0.02); box-shadow:none; border:1px solid rgba(11,26,38,0.06); }
+    [data-theme="light"] .btn, [data-theme="light"] .choice-btn{ background:#ffffff; color:var(--light-text); box-shadow:0 6px 18px rgba(11,26,38,0.06); }
+  </style>
+</head>
+<body data-theme="dark">
+  <div id="game-container" role="application" aria-label="Font Battle game"></div>
+  <div id="sr" aria-live="polite" aria-atomic="true"></div>
+
+  <script>
+  /******************************************************************
+   * FONTBATTLE - Single-file Phaser app
+   * - 15 questions per session
+   * - timer in seconds
+   * - question counter increments only on correct answers
+   * - aborts (no save) if user leaves page
+   * - settings page shows theme & top score/time
+   ******************************************************************/
+
+  // -------------------------
+  // Font lists (serif + sans)
+  // simplified but long enough (split roughly even). These are names
+  // that map to Google Fonts families (where available). On-demand
+  // loading is implemented.
+  // -------------------------
+  const SerifSet = [
+    'Merriweather','Playfair Display','Lora','Libre Baskerville','Crimson Text','Vollkorn','Spectral','Bitter','Arvo','Alegreya','EB Garamond','Tinos','PT Serif',
+    'Roboto Slab','Zilla Slab','Slabo 27px','Cormorant Garamond','Noto Serif','Cardo','Cinzel','Rokkitt','Neuton','Caudex','Merriweather Sans','Prata','Bree Serif',
+    'Forum','Gideon Roman','Bree Serif','Cormorant','Gentium Basic','Ibarra Real Nova','Quattrocento','Sanchez','Sorts Mill Goudy','Aubrey','Caveat','Fenix','Gloock',
+    'Josefin Slab','Judson','Kreon','Lustria','Luxurious Roman','Mate','Merriweather','Noticia Text','Old Standard TT','Oranienbaum','Poly','Radley','Rosarivo',
+    'Sree Krushnadevaraya','Trocchi','Trirong','Vidaloka','Volkhov','Yeseva One','Zilla Slab'
+  ];
+  const SansSet = [
+    'Inter','Roboto','Open Sans','Montserrat','Poppins','Lato','Nunito','Source Sans 3','DM Sans','Work Sans','Noto Sans','Raleway','Ubuntu','Cabin','Heebo','Fira Sans',
+    'PT Sans','Quicksand','Rubik','Muli','Karla','Jost','Manrope','Public Sans','Overpass','Hind','Exo 2','Barlow','Raleway','Varela Round','Titillium Web','Oxygen',
+    'M PLUS 1p','Asap','Archivo','Assistant','Bai Jamjuree','Chivo','Epilogue','Lexend','Outfit','Plus Jakarta Sans','Space Grotesk','Nunito Sans','Sarabun','Tajawal',
+    'Yanone Kaffeesatz','Work Sans','Cabin Condensed','Heebo','IBM Plex Sans','Figtree','Golos Text','Gothic A1','Catamaran','Be Vietnam Pro','B612','Hind Madurai'
+  ];
+  // Merge to make a large pool
+  const FONT_LIBRARY = [...new Set([...SerifSet, ...SansSet])];
+
+  // load Google font by name (inject link). idempotent.
+  function loadGoogleFont(name){
+    const id = 'gf-' + name.replace(/\s+/g,'-');
+    if(document.getElementById(id)) return;
+    const link = document.createElement('link');
+    link.id = id;
+    link.rel = 'stylesheet';
+    link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(name).replace(/%20/g,'+')}:wght@400;700&display=swap`;
+    document.head.appendChild(link);
+  }
+
+  // Accessibility announcement
+  function announce(msg){
+    const sr = document.getElementById('sr');
+    sr.textContent = '';
+    setTimeout(()=> sr.textContent = msg, 10);
+  }
+
+  // Local storage keys
+  const LS_KEY = 'fontbattle:v1';
+  function loadState(){ try{ return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); }catch(e){ return {}; } }
+  function saveState(obj){ localStorage.setItem(LS_KEY, JSON.stringify(obj)); }
+
+  // Defaults
+  const DEFAULTS = { theme:'dark', topScore:0, topTimeSeconds:0 };
+
+  // -------------------------
+  // Phaser Scenes
+  // -------------------------
+  const NAVY = 0x072033;
+  const PANEL = 0x0d2f44;
+
+  class BaseScene extends Phaser.Scene {
+    constructor(key){ super(key); }
+    createTopBar(){
+      // create simple DOM nav in topbar area (non-Phaser DOM for simplicity)
+      const container = document.getElementById('game-container');
+      // remove existing topbar if present
+      const prev = document.querySelector('.topbar');
+      if(prev) prev.remove();
+
+      const top = document.createElement('div');
+      top.className = 'topbar';
+      const left = document.createElement('div'); left.className='left';
+      const right = document.createElement('div'); right.className='right';
+
+      const btnAbout = document.createElement('button'); btnAbout.className='btn'; btnAbout.textContent='About';
+      const btnSettings = document.createElement('button'); btnSettings.className='btn'; btnSettings.textContent='Settings';
+      const btnGame = document.createElement('button'); btnGame.className='btn'; btnGame.textContent='Play';
+
+      btnAbout.onclick = ()=> this.scene.start('About');
+      btnSettings.onclick = ()=> this.scene.start('Settings');
+      btnGame.onclick = ()=> this.scene.start('Game');
+
+      left.appendChild(btnAbout);
+      left.appendChild(btnSettings);
+      right.appendChild(btnGame);
+
+      top.appendChild(left); top.appendChild(right);
+      container.appendChild(top);
+    }
+  }
+
+  class About extends BaseScene {
+    constructor(){ super('About'); }
+    create(){
+      document.body.setAttribute('data-theme', loadState().theme || DEFAULTS.theme);
+      this.cameras.main.setBackgroundColor(NAVY);
+      this.createTopBar();
+
+      const panel = this.add.dom(this.scale.width/2, 80, 'div', { class:'panel', style:'max-height:calc(100% - 180px); overflow:auto;' }, `
+        <div class="center">
+          <h1>FontBattle</h1>
+          <p class="small">Guess the font from a large glyph — inspired by classic "typewar". Each round shows a big glyph and two font-name choices. Choose the correct font.</p>
+          <p class="small">Controls: click a choice or use LEFT / RIGHT arrow keys. The session has 15 questions. The question counter increments only when you answer correctly. A timer runs while the session is active. If you exit the app (switch tabs or close the page), the session is aborted and no score is recorded.</p>
+          <div style="margin-top:12px;">
+            <button class="btn" id="start">Start Game</button>
+          </div>
+        </div>
+      `);
+      const domEl = panel.getChildByID('start');
+      domEl.onclick = ()=> this.scene.start('Game');
+    }
+  }
+
+  class Settings extends BaseScene {
+    constructor(){ super('Settings'); }
+    create(){
+      this.cameras.main.setBackgroundColor(NAVY);
+      this.createTopBar();
+      const st = loadState();
+      const theme = st.theme || DEFAULTS.theme;
+      const topScore = st.topScore || 0;
+      const topTimeSeconds = st.topTimeSeconds || 0;
+      const topTimeStr = formatSeconds(topTimeSeconds);
+
+      const html = `
+        <div class="panel">
+          <div class="center">
+            <h1>Settings</h1>
+            <div class="settings-row" style="justify-content:center;">
+              <label for="themeToggle">Theme:</label>
+              <select id="themeToggle" aria-label="Theme select">
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </div>
+            <div class="small">Top Score: <strong id="topScore">${topScore}</strong> — Time to get top score: <strong id="topTime">${topTimeStr}</strong></div>
+            <div style="margin-top:10px
